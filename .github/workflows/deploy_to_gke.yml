@@ -21,11 +21,11 @@ jobs:
     - name: 'Set up Cloud SDK'
       uses: 'google-github-actions/setup-gcloud@v2'
 
-    - name: Configure Kubernetes CLI
-      run: |
-        echo ${{ secrets.GOOGLE_CREDENTIALS }} | base64 --decode > /tmp/gcp-key.json
-        gcloud auth activate-service-account --key-file /tmp/gcp-key.json
-        gcloud container clusters get-credentials mnist-convnet-cluster --zone us-central1
+    - id: 'get-credentials'
+      uses: 'google-github-actions/get-gke-credentials@v2'
+      with:
+        cluster_name: 'mnist-convnet-cluster'
+        location: 'us-central1'
 
-    - name: Apply Kubernetes Job
+    - id: Apply Kubernetes Job
       run: kubectl apply -f mnist-job.yaml
