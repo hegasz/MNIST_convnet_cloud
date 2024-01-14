@@ -1,0 +1,14 @@
+apiVersion: "batch/v1"
+kind: "Job"
+metadata:
+  name: "mnist-convnet-job-new"
+spec:
+  template:
+    spec:
+      containers:
+      - name: "mnist-convnet-job-new"
+        image: "hegash/mnist-convnet-image:latest"
+        env:
+        - name: "WANDB_API_KEY"
+          value: "4a2bfc8af55c4761a87469879e6f5c4020ad4a6b"
+      restartPolicy: "Never"
