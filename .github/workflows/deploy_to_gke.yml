@@ -1,0 +1,25 @@
+name: Deploy to GKE
+
+on:
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  deploy-to-gke:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+      
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v2'
+      with:
+        credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
+  
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v2'
+
+    - name: Apply Kubernetes Job
+      run: kubectl apply -f /mnist-job.yaml
