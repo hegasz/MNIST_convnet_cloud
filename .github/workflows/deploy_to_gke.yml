@@ -27,5 +27,5 @@ jobs:
         cluster_name: 'mnist-convnet-cluster'
         location: 'us-central1'
 
-    - id: Apply Kubernetes Job
+    - name: Apply Kubernetes Job
       run: kubectl apply -f mnist-job.yaml
