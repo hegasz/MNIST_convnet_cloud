@@ -22,4 +22,4 @@ jobs:
       uses: 'google-github-actions/setup-gcloud@v2'
 
     - name: Apply Kubernetes Job
-      run: kubectl apply -f /mnist-job.yaml
+      run: kubectl apply -f mnist-job.yaml
