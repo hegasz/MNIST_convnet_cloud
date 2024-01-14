@@ -23,7 +23,7 @@ jobs:
 
     - name: Configure Kubernetes CLI
       run: |
-        gcloud container clusters get-credentials mnist-convnet-cluster
+        gcloud container clusters get-credentials mnist-convnet-cluster --zone us-central1
 
     - name: Apply Kubernetes Job
       run: kubectl apply -f mnist-job.yaml
