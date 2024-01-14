@@ -21,5 +21,9 @@ jobs:
     - name: 'Set up Cloud SDK'
       uses: 'google-github-actions/setup-gcloud@v2'
 
+    - name: Configure Kubernetes CLI
+      run: |
+        gcloud container clusters get-credentials mnist-convnet-cluster
+
     - name: Apply Kubernetes Job
       run: kubectl apply -f mnist-job.yaml
