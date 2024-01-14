@@ -23,6 +23,8 @@ jobs:
 
     - name: Configure Kubernetes CLI
       run: |
+        echo ${{ secrets.GOOGLE_CREDENTIALS }} | base64 --decode > /tmp/gcp-key.json
+        gcloud auth activate-service-account --key-file /tmp/gcp-key.json
         gcloud container clusters get-credentials mnist-convnet-cluster --zone us-central1
 
     - name: Apply Kubernetes Job
