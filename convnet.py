@@ -89,7 +89,7 @@ wandb.init(
     }
 )
 
-for epoch in range(4):
+for epoch in range(3):
     running_batchgroup_loss = 0.0
     running_epoch_loss = 0.0
     correct = 0
