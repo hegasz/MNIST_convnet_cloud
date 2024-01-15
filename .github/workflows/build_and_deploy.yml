@@ -1,4 +1,4 @@
-name: Build & Push to DockerHub
+name: Build, Push to DockerHub, Deploy to GKE cluster
 
 on:
   push:
