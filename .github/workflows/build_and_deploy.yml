@@ -69,5 +69,17 @@ jobs:
                      value: "${{ secrets.WANDB_API_KEY }}"
                  restartPolicy: "Never"" > ~/mnist-job-${{ github.ref_name }}.yaml
 
+
+
     - name: Apply Kubernetes Job
-      run: kubectl apply -f ~/mnist-job-${{ github.ref_name }}.yaml
+      run: |
+           sudo apt-get update
+           sudo apt-get install -y curl
+           curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+
+           # Make kubectl executable
+           chmod +x kubectl
+
+           # Move kubectl to a directory in the PATH
+           sudo mv kubectl /usr/local/bin/
+           kubectl apply -f ~/mnist-job-${{ github.ref_name }}.yaml
