@@ -6,20 +6,8 @@ jobs:
   ARC-Test:
     runs-on: arc-runner-set
     steps:
-
-      - name: Setup Docker
-        run: |
-          docker run --privileged -d --name=docker-dind -v /var/lib/docker:/var/lib/docker docker:dind
-
-      - name: Wait for Docker to start
-        run: docker exec docker-dind docker info
+      - name: Checkout Repository
+        uses: actions/checkout@v2
 
       - name: Build Docker Image
-        run: docker exec docker-dind docker build -t hegash/mnist-convnet-image:arc-docker-test .
-
-      - name: Login to Docker Hub
-        run: docker exec docker-dind docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Push Docker Image to Docker Hub
-        run: docker exec docker-dind docker push hegash/mnist-convnet-image:arc-docker-test
-    
+        run: docker build -t your-dockerhub-username/your-image-name:latest .
