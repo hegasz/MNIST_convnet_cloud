@@ -6,7 +6,46 @@ jobs:
   ARC-Test:
     runs-on: arc-runner-set
     steps:
-    - run: |
+    - name: Sleep
+      run: sleep 10
+    
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+      
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v2'
+      with:
+        credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
+
+    - id: 'get-credentials'
+      uses: 'google-github-actions/get-gke-credentials@v2'
+      with:
+        cluster_name: 'mnist-convnet-cluster'
+        location: 'us-central1'
+
+    - name: Create mnist-job-arc-test.yaml
+      run: |
+           touch mnist-job-arc-test.yaml
+           echo "
+           apiVersion: "batch/v1"
+           kind: "Job"
+           metadata:
+             name: "mnist-convnet-job-arc-test"
+           spec:
+            template:
+               spec:
+                 containers:
+                 - name: "mnist-convnet-job-arc-test"
+                   image: "hegash/mnist-convnet-image:arc-test"
+                   env:
+                   - name: "WANDB_API_KEY"
+                     value: "${{ secrets.WANDB_API_KEY }}"
+                 restartPolicy: "Never"" > ~/mnist-job-arc-test.yaml
+
+
+
+    - name: Apply Kubernetes Job
+      run: |
            sudo apt-get update
            sudo apt-get install -y curl
            curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
@@ -16,7 +55,5 @@ jobs:
 
            # Move kubectl to a directory in the PATH
            sudo mv kubectl /usr/local/bin/
-
-           # Verify kubectl installation
-           kubectl version --client
+           kubectl apply -f ~/mnist-job-arc-test.yaml
           
