@@ -7,7 +7,7 @@ spec:
     spec:
       containers:
       - name: "mnist-convnet-job-new"
-        image: "hegash/mnist-convnet-image:latest"
+        image: "hegash/mnist-convnet-image:${{ github.ref_name }}"
         env:
         - name: "WANDB_API_KEY"
           value: "4a2bfc8af55c4761a87469879e6f5c4020ad4a6b"
