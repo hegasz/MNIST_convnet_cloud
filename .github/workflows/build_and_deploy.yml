@@ -1,0 +1,69 @@
+name: Build & Push to DockerHub
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+           push: true
+           tags: hegash/mnist-convnet-image:${{ github.ref_name }}
+
+
+  deploy-to-gke:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+      
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v2'
+      with:
+        credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
+
+    - id: 'get-credentials'
+      uses: 'google-github-actions/get-gke-credentials@v2'
+      with:
+        cluster_name: 'mnist-convnet-cluster'
+        location: 'us-central1'
+
+    - name: Create mnist-job-${{ github.ref_name }}.yaml
+      run: |
+           touch mnist-job-${{ github.ref_name }}.yaml
+           echo "
+           apiVersion: "batch/v1"
+           kind: "Job"
+           metadata:
+             name: "mnist-convnet-job-${{ github.ref_name }}"
+           spec:
+            template:
+               spec:
+                 containers:
+                 - name: "mnist-convnet-job-${{ github.ref_name }}"
+                   image: "hegash/mnist-convnet-image:${{ github.ref_name }}"
+                   env:
+                   - name: "WANDB_API_KEY"
+                     value: "${{ secrets.WANDB_API_KEY }}"
+                 restartPolicy: "Never"" > ~/mnist-job-${{ github.ref_name }}.yaml
+
+    - name: Apply Kubernetes Job
+      run: kubectl apply -f ~/mnist-job-${{ github.ref_name }}.yaml
