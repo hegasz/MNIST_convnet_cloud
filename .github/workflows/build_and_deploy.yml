@@ -9,6 +9,13 @@ jobs:
   build-and-push:
     runs-on: arc-runner-set
     steps:
+
+      - name: Install Docker
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker.io
+          sudo usermod -aG docker $USER
+    
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
         
