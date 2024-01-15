@@ -2,8 +2,8 @@ name: Deploy to GKE
 
 on:
   push:
-    branches:
-      - 'main'
+    tags:
+      - '*'
 
 jobs:
   deploy-to-gke:
