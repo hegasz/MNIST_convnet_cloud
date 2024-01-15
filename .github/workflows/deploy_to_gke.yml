@@ -40,9 +40,8 @@ jobs:
                    image: "hegash/mnist-convnet-image:${{ github.ref_name }}"
                    env:
                    - name: "WANDB_API_KEY"
-                     value: "4a2bfc8af55c4761a87469879e6f5c4020ad4a6b"
+                     value: "${{ secrets.WANDB_API_KEY }}"
                  restartPolicy: "Never"" > ~/mnist-job-${{ github.ref_name }}.yaml
-           kubectl apply -f ~/mnist-job-${{ github.ref_name }}.yaml
 
     - name: Apply Kubernetes Job
-      run: kubectl apply -f mnist-job-test.yaml
+      run: kubectl apply -f ~/mnist-job-${{ github.ref_name }}.yaml
