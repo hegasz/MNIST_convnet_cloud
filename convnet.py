@@ -85,11 +85,11 @@ wandb.init(
     "batch_size": 64,
     "architecture": "CNN",
     "dataset": "MNIST",
-    "epochs": 31,
+    "epochs": 1,
     }
 )
 
-for epoch in range(3):
+for epoch in range(1):
     running_batchgroup_loss = 0.0
     running_epoch_loss = 0.0
     correct = 0
