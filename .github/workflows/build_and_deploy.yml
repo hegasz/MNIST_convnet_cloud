@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-and-push:
-    runs-on: ubuntu-latest
+    runs-on: arc-runner-set
     steps:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -29,7 +29,7 @@ jobs:
 
 
   deploy-to-gke:
-    runs-on: ubuntu-latest
+    runs-on: arc-runner-set
     needs: build-and-push
     steps:
     - name: Sleep
