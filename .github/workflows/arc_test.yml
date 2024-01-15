@@ -6,4 +6,4 @@ jobs:
   Explore-GitHub-Actions:
     runs-on: arc-runner-set
     steps:
-    - run: echo "worked"
+    - run: kubectl version
