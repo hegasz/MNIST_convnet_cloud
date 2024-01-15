@@ -3,9 +3,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  Explore-GitHub-Actions:
+  ARC-Test:
     runs-on: arc-runner-set
     steps:
     - run: |
-           sudo apt-get update
+           gcloud components install kubectl
+           
           
