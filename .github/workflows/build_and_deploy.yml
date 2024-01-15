@@ -9,6 +9,9 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     steps:
+      - name: Sleep (10s)
+      - run: sleep 10
+    
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
         
