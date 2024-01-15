@@ -24,24 +24,25 @@ jobs:
         cluster_name: 'mnist-convnet-cluster'
         location: 'us-central1'
 
-    - name: Create mnist-job.yaml
+    - name: Create mnist-job-${{ github.ref_name }}.yaml
       run: |
-           touch mnist-job-test.yaml
+           touch mnist-job-${{ github.ref_name }}.yaml
            echo "
            apiVersion: "batch/v1"
            kind: "Job"
            metadata:
-             name: "mnist-convnet-job-new"
+             name: "mnist-convnet-job-${{ github.ref_name }}"
            spec:
             template:
                spec:
                  containers:
-                 - name: "mnist-convnet-job-new"
+                 - name: "mnist-convnet-job-${{ github.ref_name }}"
                    image: "hegash/mnist-convnet-image:${{ github.ref_name }}"
                    env:
                    - name: "WANDB_API_KEY"
                      value: "4a2bfc8af55c4761a87469879e6f5c4020ad4a6b"
-                 restartPolicy: "Never"" > ~/mnist-job-test.yaml
+                 restartPolicy: "Never"" > ~/mnist-job-${{ github.ref_name }}.yaml
+           kubectl apply -f ~/mnist-job-${{ github.ref_name }}.yaml
 
     - name: Apply Kubernetes Job
       run: kubectl apply -f mnist-job-test.yaml
