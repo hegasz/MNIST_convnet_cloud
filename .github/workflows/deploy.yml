@@ -7,11 +7,7 @@ on:
 jobs:
   build:
     runs-on: arc-runner-set
-    container:
-      image: gcr.io/kaniko-project/executor:debug # the kaniko image
-    permissions:
-      contents: read # read the repository
-      #packages: write # push to GHCR, omit if not pushing to GitHub's container registry
+  
 
     steps:
       - name: Build and push container test
