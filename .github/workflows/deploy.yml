@@ -1,34 +1,48 @@
-name: Build and Deploy to GKE
+name: ARC deploy
 
 on:
   workflow_dispatch:
 
 jobs:
   build_and_deploy:
-    runs-on: arc-runner-set
+    runs-on: self-hosted
+
+    env:
+      GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Ensure Docker daemon is running
+        run: |
+          sudo systemctl start docker
+          sudo systemctl status docker
+
+      - name: Add user to Docker group
+        run: |
+          sudo usermod -aG docker $USER
+        shell: bash
+
+      - name: Log out and log back in
+        run: |
+          exec sudo su -l $USER
+        shell: bash
+
+      - name: Configure GKE context
+        run: |
+          echo "$GOOGLE_CREDENTIALS" > keyfile.json
+          gcloud auth activate-service-account --key-file=keyfile.json
+          gcloud container clusters get-credentials mnist-convnet-cluster --zone=us-central1 --project=mltest-411022
+
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v1
 
       - name: Build Docker image
         run: |
           docker buildx create --use
           docker buildx build --platform linux/amd64,linux/arm64 -t gcr.io/mltest/arc-test:latest .
 
-      - name: Configure GKE context
-        run: |
-          # Authenticate with GKE using the service account key stored in the secret
-          echo "$GOOGLE_CREDENTIALS" > keyfile.json
-          gcloud auth activate-service-account --key-file=keyfile.json
-          gcloud container clusters get-credentials mnist-convnet-cluster --zone=us-central1 --project=mltest-411022
-
       - name: Deploy to GKE
         run: |
-          # Deploy the application to GKE using kubectl
           kubectl apply -f path/to/your/kubernetes/config.yaml
-        env:
-          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
