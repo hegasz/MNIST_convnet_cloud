@@ -4,28 +4,20 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: [kaniko-worker] # our new runner set
-    container:
-      image: gcr.io/kaniko-project/executor:debug # the kaniko image
-    permissions:
-      contents: read # read the repository
-      packages: write # push to GHCR, omit if not pushing to GitHub's container registry
-
+  build-and-deploy:
+    runs-on: arc-runner-set
+    services:
+      docker:
+        image: docker:dind
+        options: --privileged
     steps:
-      - name: Build and push container test
-        run: |
-          # Write config file, change to your destination registry
-          AUTH=$(echo -n ${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} | base64)
-          echo "{\"auths\": {\"ghcr.io\": {\"auth\": \"${AUTH}\"}}}" > /kaniko/.docker/config.json
+    - name: check code
+      uses: actions/checkout@v2
 
-          # Configure git
-          export GIT_USERNAME="kaniko-bot"
-          export GIT_PASSWORD="${{ secrets.GITHUB_TOKEN }}" # works for GHEC or GHES container registry
+    - name: build image by inside dind
+      run: |
+        docker build -t my-app:latest .
 
-          # Build and push (sub in your image, of course)
-          /kaniko/executor --dockerfile="./images/ubi9.Dockerfile" \
-            --context="${{ github.repositoryUrl }}#${{ github.ref }}#${{ github.sha }}" \
-            --destination="ghcr.io/some-natalie/kubernoodles/kaniko-build:test" \
-            --push-retry 5 \
-            --image-name-with-digest-file /workspace/image-digest.txt
+    - name: deploy on your cluster
+      run: |
+        kubectl --kubeconfig /path/to/kubeconfig apply -f k8s-deployment.yaml
