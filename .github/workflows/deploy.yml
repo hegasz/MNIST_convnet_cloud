@@ -3,12 +3,13 @@ name: ARC deploy
 on:
   workflow_dispatch:
 
+
 jobs:
   build_and_deploy:
     runs-on: arc-runner-set
 
     env:
-      GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+      GOOGLE_CREDENTIALS: ${{ secrets.GKE_SERVICE_ACCOUNT_KEY }}
 
     steps:
       - name: Checkout code
@@ -16,7 +17,14 @@ jobs:
 
       - name: Start Docker daemon
         run: |
-          sudo service docker start
+          if sudo service docker.io start; then
+            echo "Docker daemon started successfully using service command."
+          elif sudo systemctl start docker.io; then
+            echo "Docker daemon started successfully using systemctl command."
+          else
+            echo "Unable to start Docker daemon."
+            exit 1
+          fi
 
       - name: Add user to Docker group
         run: |
