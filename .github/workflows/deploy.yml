@@ -14,10 +14,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Ensure Docker daemon is running
+      - name: Start Docker daemon
         run: |
-          sudo systemctl start docker
-          sudo systemctl status docker
+          sudo service docker start
 
       - name: Add user to Docker group
         run: |
@@ -41,7 +40,7 @@ jobs:
       - name: Build Docker image
         run: |
           docker buildx create --use
-          docker buildx build --platform linux/amd64,linux/arm64 -t gcr.io/mltest/arc-test:latest .
+          docker buildx build --platform linux/amd64,linux/arm64 -t gcr.io/mltest-411022/YOUR_IMAGE_NAME:latest .
 
       - name: Deploy to GKE
         run: |
