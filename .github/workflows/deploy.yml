@@ -5,51 +5,28 @@ on:
 
 
 jobs:
-  build_and_deploy:
+  build:
     runs-on: arc-runner-set
-
-    env:
-      GOOGLE_CREDENTIALS: ${{ secrets.GKE_SERVICE_ACCOUNT_KEY }}
+    container:
+      image: gcr.io/kaniko-project/executor:debug # the kaniko image
+    permissions:
+      contents: read # read the repository
+      #packages: write # push to GHCR, omit if not pushing to GitHub's container registry
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Start Docker daemon
+      - name: Build and push container test
         run: |
-          if sudo service docker.io start; then
-            echo "Docker daemon started successfully using service command."
-          elif sudo systemctl start docker.io; then
-            echo "Docker daemon started successfully using systemctl command."
-          else
-            echo "Unable to start Docker daemon."
-            exit 1
-          fi
+          # Write config file, change to your destination registry
+          AUTH=$(echo -n ${{ github.actor }}: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 | base64)
+          echo "{\"auths\": {\"ghcr.io\": {\"auth\": \"${AUTH}\"}}}" > /kaniko/.docker/config.json
 
-      - name: Add user to Docker group
-        run: |
-          sudo usermod -aG docker $USER
-        shell: bash
+          # Configure git
+          export GIT_USERNAME="hegasz"
+          export GIT_PASSWORD="${{ secrets.GITHUB_TOKEN }}" # works for GHEC or GHES container registry
 
-      - name: Log out and log back in
-        run: |
-          exec sudo su -l $USER
-        shell: bash
-
-      - name: Configure GKE context
-        run: |
-          echo "$GOOGLE_CREDENTIALS" > keyfile.json
-          gcloud auth activate-service-account --key-file=keyfile.json
-          gcloud container clusters get-credentials mnist-convnet-cluster --zone=us-central1 --project=mltest-411022
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-
-      - name: Build Docker image
-        run: |
-          docker buildx create --use
-          docker buildx build --platform linux/amd64,linux/arm64 -t gcr.io/mltest-411022/YOUR_IMAGE_NAME:latest .
-
-      - name: Deploy to GKE
-        run: |
-          kubectl apply -f path/to/your/kubernetes/config.yaml
+          # Build and push (sub in your image, of course)
+          /kaniko/executor --dockerfile="./images/ubi9.Dockerfile" \
+            --context="${{ github.repositoryUrl }}#${{ github.ref }}#${{ github.sha }}" \
+            --destination="ghcr.io/hegash/arc-kaniko-build:test" \
+            --push-retry 5 \
+            --image-name-with-digest-file /workspace/image-digest.txt
