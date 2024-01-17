@@ -1,4 +1,4 @@
-name: Temp 2
+name: B
 
 on:
   workflow_dispatch:
