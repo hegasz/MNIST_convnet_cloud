@@ -1,3 +1,5 @@
+name: Master Controller
+
 on:
   workflow_dispatch:
     inputs:
