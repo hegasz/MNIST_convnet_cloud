@@ -1,0 +1,103 @@
+name: auto-called deploy existing
+
+on:
+  workflow_call:
+    inputs:
+      image-name:
+        type: string
+        required: true
+      job-name:
+        type: string
+        required: true
+      batch-size:
+        type: string
+        required: true
+      learning-rate:
+        type: string
+        required: true
+      num-epochs:
+        type: string
+        required: true
+    secrets:
+      google-auth:
+        required: true
+      DOCKERHUB_USERNAME:
+        required: true
+      DOCKERHUB_TOKEN:
+        required: true
+
+jobs:
+
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+           push: true
+           tags: ${{ github.event.inputs.image-name}}
+
+  deploy-to-gke:
+    runs-on: arc-runner-set
+    needs: build-and-push
+    steps:    
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+      
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v2'
+      with:
+        credentials_json: '${{ secrets.google-auth }}'
+
+    - id: 'get-credentials'
+      uses: 'google-github-actions/get-gke-credentials@v2'
+      with:
+        cluster_name: 'mnist-convnet-cluster'
+        location: 'us-central1'
+
+    - name: Create mnist-job.yaml
+      run: |
+           touch mnist-job.yaml
+           echo "
+           apiVersion: "batch/v1"
+           kind: "Job"
+           metadata:
+             name: "${{ github.event.inputs.job-name }}"
+           spec:
+            template:
+               spec:
+                 containers:
+                 - name: "${{ github.event.inputs.job-name}}"
+                   image: "${{ github.event.inputs.image-name}}"
+                   #args: e.g. ["--batch_size=12"] or other args you want
+                   env:
+                   - name: "WANDB_API_KEY"
+                     value: "${{ secrets.WANDB_API_KEY }}"
+                 restartPolicy: "Never"" > ~/mnist-job.yaml
+
+
+
+    - name: Apply Kubernetes Job
+      run: |
+           sudo apt-get update
+           sudo apt-get install -y curl
+           curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+
+           # Make kubectl executable
+           chmod +x kubectl
+
+           # Move kubectl to a directory in the PATH
+           sudo mv kubectl /usr/local/bin/
+           kubectl apply -f ~/mnist-job.yaml
