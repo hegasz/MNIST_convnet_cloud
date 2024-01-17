@@ -9,7 +9,7 @@ on:
   # push:
 
 env:
-  number-nodes: 64
+  number-nodes: 14
 
 jobs:
   prejob:
