@@ -78,6 +78,7 @@ jobs:
       num-epochs: ${{ matrix.num_epochs }}
     secrets:
       google-auth: ${{ secrets.GOOGLE_CREDENTIALS }}
+      WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
 
   call-build-and-deploy:
     needs: prejob
@@ -99,3 +100,4 @@ jobs:
       google-auth: ${{ secrets.GOOGLE_CREDENTIALS }}
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
