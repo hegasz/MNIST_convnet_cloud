@@ -33,7 +33,7 @@ jobs:
 
       - id: set-batch-size
         run: |
-          batch_size=$(print(str("${{ github.event.inputs.batch-size}}".split(",")).replace(' ', '')))
+          batch_size=$(python -c "print(str("${{ github.event.inputs.batch-size}}".split(",")).replace(' ', '')))
           echo "batch_size=$batch_size" >> $GITHUB_OUTPUT
       - id: set-learning-rate
         run: |
