@@ -68,7 +68,7 @@ jobs:
         batch_size: ${{ fromJson(needs.prejob.outputs.batch_size) }}
         learning_rate: ${{ fromJson(needs.prejob.outputs.learning_rate) }}
         num_epochs: ${{ fromJson(needs.prejob.outputs.num_epochs) }}
-    uses: ./.github/workflows/deploy_existing.yml
+    uses: ./.github/workflows/reusable_deploy_existing.yml
     with:
       image-name: ${{ inputs.image-name }}
       job-name: ${{ inputs.job-name }}
