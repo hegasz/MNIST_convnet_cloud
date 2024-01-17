@@ -57,7 +57,7 @@ jobs:
                  containers:
                  - name: "${{ github.event.inputs.job-name}}"
                    image: "${{ github.event.inputs.image-name}}"
-                   #args: e.g. ["--batch_size=12"] or other args you want
+                   args: ["--batch_size=${{ inputs.batch-size }},--learning_rate=${{ inputs.learning-rate }},--num_epochs=${{ inputs.num-epochs }}"]
                    env:
                    - name: "WANDB_API_KEY"
                      value: "${{ secrets.WANDB_API_KEY }}"
