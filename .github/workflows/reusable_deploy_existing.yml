@@ -21,6 +21,8 @@ on:
     secrets:
       google-auth:
         required: true
+      WANDB_API_KEY:
+        required: true
 
 jobs:
 
