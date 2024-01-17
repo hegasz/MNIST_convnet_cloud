@@ -6,6 +6,16 @@ on:
         description: 'Deploy existing instead of building then deploying'
         required: true
         default: 'true'
+      image-name:
+        type: string
+        description: 'Image name'
+        required: true
+        default: 'hegash/mnist-convnet-image:latest'
+      job-name:
+        type: string
+        description: 'Job name'
+        required: true
+        default: 'mnist-convnet-job'
       batch-size:
         type: string
         description: 'Batch size'
@@ -58,6 +68,8 @@ jobs:
         num_epochs: ${{ fromJson(needs.prejob.outputs.num_epochs) }}
     uses: ./.github/workflows/deploy_existing.yml
     with:
-      batch_size: ${{ matrix.batch_size }}
-      learning_rate: ${{ matrix.learning_rate }}
-      num_epochs: ${{ matrix.num_epochs }}
+      image-name: ${{ inputs.image-name }}
+      job-name: ${{ inputs.job-name }}
+      batch-size: ${{ matrix.batch_size }}
+      learning-rate: ${{ matrix.learning_rate }}
+      num-epochs: ${{ matrix.num_epochs }}
