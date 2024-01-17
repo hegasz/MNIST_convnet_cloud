@@ -1,4 +1,4 @@
-name: Deploy to GKE
+name: Temp 2
 
 on:
   workflow_dispatch:
