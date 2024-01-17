@@ -75,3 +75,4 @@ jobs:
       batch-size: ${{ matrix.batch_size }}
       learning-rate: ${{ matrix.learning_rate }}
       num-epochs: ${{ matrix.num_epochs }}
+      google-auth: ${{ secrets.GOOGLE_CREDENTIALS }}
