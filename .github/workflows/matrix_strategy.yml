@@ -4,10 +4,10 @@ on:
   workflow_dispatch:
     inputs:
       deploy-existing:
-        type: bool
+        type: boolean
         description: 'Deploy existing instead of building then deploying'
         required: true
-        default: 'true'
+        default: true
       image-name:
         type: string
         description: 'Image name'
@@ -41,7 +41,6 @@ jobs:
       batch_size: ${{ steps.set-batch-size.outputs.batch_size }}
       learning_rate: ${{ steps.set-learning-rate.outputs.learning_rate }}
       num_epochs: ${{ steps.set-num-epochs.outputs.num_epochs }}
-      next_yaml_file: ${{ steps.pick-next-yaml.outputs.next_yaml_file }}
     steps:
       - name: Python setup
         uses: actions/setup-python@v3
@@ -60,23 +59,36 @@ jobs:
         run: |
           num_epochs=$(python -c "print(str('${{ github.event.inputs.num-epochs }}'.split(',')).replace(' ', ''))")
           echo "num_epochs=$num_epochs" >> $GITHUB_OUTPUT
-      - id: pick-next-yaml
-        run: |
-          if [[ ${{ github.event.inputs.deploy-existing }} ]]; then
-              echo "next_yaml_file=./.github/workflows/reusable_deploy_existing.yml" >> "$GITHUB_ENV"
-          else
-              echo "next_yaml_file=./.github/workflows/reusable_build_and_deploy.yml" >> "$GITHUB_ENV"
-          fi
 
-  call-next-process:
+  call-deploy-existing:
     needs: prejob
+    if: ${{ inputs.deploy-existing }}
     strategy:
       fail-fast: true
       matrix:
         batch_size: ${{ fromJson(needs.prejob.outputs.batch_size) }}
         learning_rate: ${{ fromJson(needs.prejob.outputs.learning_rate) }}
         num_epochs: ${{ fromJson(needs.prejob.outputs.num_epochs) }}
-    uses: ${{ needs.prejob.outputs.next_yaml_file }}
+    uses: ./.github/workflows/reusable_deploy_existing.yml
+    with:
+      image-name: ${{ inputs.image-name }}
+      job-name: ${{ inputs.job-name }}
+      batch-size: ${{ matrix.batch_size }}
+      learning-rate: ${{ matrix.learning_rate }}
+      num-epochs: ${{ matrix.num_epochs }}
+    secrets:
+      google-auth: ${{ secrets.GOOGLE_CREDENTIALS }}
+
+  call-build-and-deploy:
+    needs: prejob
+    if: ${{ ! inputs.deploy-existing }}
+    strategy:
+      fail-fast: true
+      matrix:
+        batch_size: ${{ fromJson(needs.prejob.outputs.batch_size) }}
+        learning_rate: ${{ fromJson(needs.prejob.outputs.learning_rate) }}
+        num_epochs: ${{ fromJson(needs.prejob.outputs.num_epochs) }}
+    uses: ./.github/workflows/reusable_build_and_deploy.yml
     with:
       image-name: ${{ inputs.image-name }}
       job-name: ${{ inputs.job-name }}
