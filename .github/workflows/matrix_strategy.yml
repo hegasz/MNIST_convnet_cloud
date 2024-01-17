@@ -41,6 +41,7 @@ jobs:
       batch_size: ${{ steps.set-batch-size.outputs.batch_size }}
       learning_rate: ${{ steps.set-learning-rate.outputs.learning_rate }}
       num_epochs: ${{ steps.set-num-epochs.outputs.num_epochs }}
+      next_yaml_file: ${{ steps.pick-next-yaml.outputs.next_yaml_file }}
     steps:
       - name: Python setup
         uses: actions/setup-python@v3
@@ -49,16 +50,23 @@ jobs:
 
       - id: set-batch-size
         run: |
-          batch_size=$(python -c "print(str('${{ github.event.inputs.batch-size}}'.split(',')).replace(' ', ''))")
+          batch_size=$(python -c "print(str('${{ github.event.inputs.batch-size }}'.split(',')).replace(' ', ''))")
           echo "batch_size=$batch_size" >> $GITHUB_OUTPUT
       - id: set-learning-rate
         run: |
-          learning_rate=$(python -c "print(str('${{ github.event.inputs.learning-rate}}'.split(',')).replace(' ', ''))")
+          learning_rate=$(python -c "print(str('${{ github.event.inputs.learning-rate }}'.split(',')).replace(' ', ''))")
           echo "learning_rate=$learning_rate" >> $GITHUB_OUTPUT
       - id: set-num-epochs
         run: |
-          num_epochs=$(python -c "print(str('${{ github.event.inputs.num-epochs}}'.split(',')).replace(' ', ''))")
+          num_epochs=$(python -c "print(str('${{ github.event.inputs.num-epochs }}'.split(',')).replace(' ', ''))")
           echo "num_epochs=$num_epochs" >> $GITHUB_OUTPUT
+      - id: pick-next-yaml
+        run: |
+          if [[ ${{ github.event.inputs.deploy-existing }} ]]; then
+              echo "next_yaml_file=./.github/workflows/reusable_deploy_existing.yml" >> "$GITHUB_ENV"
+          else
+              echo "next_yaml_file=./.github/workflows/reusable_build_and_deploy.yml" >> "$GITHUB_ENV"
+          fi
 
   call-next-process:
     needs: prejob
@@ -68,7 +76,7 @@ jobs:
         batch_size: ${{ fromJson(needs.prejob.outputs.batch_size) }}
         learning_rate: ${{ fromJson(needs.prejob.outputs.learning_rate) }}
         num_epochs: ${{ fromJson(needs.prejob.outputs.num_epochs) }}
-    uses: ./.github/workflows/reusable_deploy_existing.yml
+    uses: ${{ needs.prejob.outputs.next_yaml_file }}
     with:
       image-name: ${{ inputs.image-name }}
       job-name: ${{ inputs.job-name }}
