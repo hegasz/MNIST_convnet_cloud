@@ -1,6 +1,11 @@
 on:
   workflow_dispatch:
     inputs:
+      deploy-existing:
+        type: bool
+        description: 'Deploy existing instead of building then deploying'
+        required: true
+        default: 'true'
       batch-size:
         type: string
         description: 'Batch size'
@@ -19,7 +24,6 @@ on:
 
 jobs:
   prejob:
-    # runs-on: arc-gke
     runs-on: ubuntu-latest
     outputs:
       batch_size: ${{ steps.set-batch-size.outputs.batch_size }}
@@ -44,9 +48,7 @@ jobs:
           num_epochs=$(python -c "print(str('${{ github.event.inputs.num-epochs}}'.split(',')).replace(' ', ''))")
           echo "num_epochs=$num_epochs" >> $GITHUB_OUTPUT
 
-  test:
-    # runs-on: arc-gke
-    runs-on: ubuntu-latest
+  call-next-process:
     needs: prejob
     strategy:
       fail-fast: true
@@ -54,9 +56,8 @@ jobs:
         batch_size: ${{ fromJson(needs.prejob.outputs.batch_size) }}
         learning_rate: ${{ fromJson(needs.prejob.outputs.learning_rate) }}
         num_epochs: ${{ fromJson(needs.prejob.outputs.num_epochs) }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Run tests
-        run: |
-          echo "Running tests with batch size ${{ matrix.batch_size }}, learning rate ${{ matrix.learning_rate }}, num epochs ${{ matrix.num_epochs }}"
+    uses: ./.github/workflows/deploy_existing.yml
+    with:
+      batch_size: ${{ matrix.batch_size }}
+      learning_rate: ${{ matrix.learning_rate }}
+      num_epochs: ${{ matrix.num_epochs }}
