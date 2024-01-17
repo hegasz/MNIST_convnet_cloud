@@ -14,7 +14,7 @@ env:
 jobs:
   prejob:
     # runs-on: arc-gke
-    runs-on: andrew-arc-runners
+    runs-on: ubuntu-latest
     outputs:
       node_matrix: ${{ steps.set-matrix.outputs.node_matrix }}
     steps:
@@ -31,7 +31,7 @@ jobs:
 
   test:
     # runs-on: arc-gke
-    runs-on: andrew-arc-runners
+    runs-on: ubuntu-latest
     needs: prejob
     strategy:
       fail-fast: true
