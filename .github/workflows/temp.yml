@@ -33,15 +33,15 @@ jobs:
 
       - id: set-batch-size
         run: |
-          batch_size=$(python -c "print(str("${{ github.event.inputs.batch-size}}".split(",")).replace(' ', '')))
+          batch_size=$(python -c "print(str("${{ github.event.inputs.batch-size}}".split(",")).replace(' ', ''))")
           echo "batch_size=$batch_size" >> $GITHUB_OUTPUT
       - id: set-learning-rate
         run: |
-          learning_rate=$(python -c "print(str("${{ github.event.inputs.learning-rate}}".split(",")).replace(' ', '')))
+          learning_rate=$(python -c "print(str("${{ github.event.inputs.learning-rate}}".split(",")).replace(' ', ''))")
           echo "learning_rate=$learning_rate" >> $GITHUB_OUTPUT
       - id: set-num-epochs
         run: |
-          num_epochs=$(python -c "print(str("${{ github.event.inputs.num-epochs-size}}".split(",")).replace(' ', '')))
+          num_epochs=$(python -c "print(str("${{ github.event.inputs.num-epochs-size}}".split(",")).replace(' ', ''))")
           echo "num_epochs=$num_epochs" >> $GITHUB_OUTPUT
 
   test:
