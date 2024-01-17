@@ -41,7 +41,7 @@ jobs:
           echo "learning_rate=$learning_rate" >> $GITHUB_OUTPUT
       - id: set-num-epochs
         run: |
-          num_epochs=$(python -c "print(str('${{ github.event.inputs.num-epochs-size}}'.split(',')).replace(' ', ''))")
+          num_epochs=$(python -c "print(str('${{ github.event.inputs.num-epochs}}'.split(',')).replace(' ', ''))")
           echo "num_epochs=$num_epochs" >> $GITHUB_OUTPUT
 
   test:
