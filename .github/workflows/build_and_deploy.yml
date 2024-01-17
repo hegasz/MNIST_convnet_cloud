@@ -1,4 +1,4 @@
-name: Deploy existing image
+name: Build and deploy image
 
 on:
   workflow_dispatch:
