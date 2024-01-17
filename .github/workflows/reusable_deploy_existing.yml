@@ -18,6 +18,9 @@ on:
       num-epochs:
         type: string
         required: true
+    secrets:
+      google-auth:
+        required: true
 
 jobs:
 
@@ -30,7 +33,7 @@ jobs:
     - id: 'auth'
       uses: 'google-github-actions/auth@v2'
       with:
-        credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
+        credentials_json: '${{ secrets.google-auth }}'
 
     - id: 'get-credentials'
       uses: 'google-github-actions/get-gke-credentials@v2'
