@@ -25,6 +25,8 @@ on:
         required: true
       DOCKERHUB_TOKEN:
         required: true
+      WANDB_API_KEY:
+        required: true
 
 jobs:
 
