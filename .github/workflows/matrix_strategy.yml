@@ -62,7 +62,8 @@ jobs:
           echo "num_epochs=$num_epochs" >> $GITHUB_OUTPUT
       - id: set-no-dot-lr
         run: |
-          no_dot_lr=${${{ github.event.inputs.learning-rate }}//./_}
+          var="${{ github.event.inputs.learning-rate }}"
+          no_dot_lr=${var//./_}
           echo "no_dot_lr=$no_dot_lr" >> $GITHUB_OUTPUT
 
   call-deploy-existing:
