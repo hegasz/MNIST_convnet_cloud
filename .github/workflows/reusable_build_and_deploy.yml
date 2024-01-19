@@ -18,6 +18,9 @@ on:
       num-epochs:
         type: string
         required: true
+      no-dot-lr:
+        type: string
+        required: true
     secrets:
       google-auth:
         required: true
