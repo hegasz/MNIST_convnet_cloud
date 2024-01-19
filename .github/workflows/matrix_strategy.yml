@@ -81,6 +81,7 @@ jobs:
       batch-size: ${{ matrix.batch_size }}
       learning-rate: ${{ matrix.learning_rate }}
       num-epochs: ${{ matrix.num_epochs }}
+      no-dot-lr: ${{ needs.prejob.outputs.no_dot_lr }}
     secrets:
       google-auth: ${{ secrets.GOOGLE_CREDENTIALS }}
       WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
