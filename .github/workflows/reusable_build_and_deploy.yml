@@ -79,12 +79,12 @@ jobs:
            apiVersion: "batch/v1"
            kind: "Job"
            metadata:
-             name: "${{ format('{0}-{1}-{2}-{3}', github.event.inputs.job-name, inputs.batch-size, inputs.learning-rate, inputs.num-epochs) }}"
+             name: "${{ format('{0}-{1}-{2}-{3}', github.event.inputs.job-name, inputs.batch-size, inputs.no-dot-lr, inputs.num-epochs) }}"
            spec:
             template:
                spec:
                  containers:
-                 - name: "${{ format('{0}-{1}-{2}-{3}', github.event.inputs.job-name, inputs.batch-size, inputs.learning-rate, inputs.num-epochs) }}"
+                 - name: "${{ format('{0}-{1}-{2}-{3}', github.event.inputs.job-name, inputs.batch-size, inputs.no-dot-lr, inputs.num-epochs) }}"
                    image: "${{ github.event.inputs.image-name}}"
                    args: ["--batch_size=${{ inputs.batch-size }},--learning_rate=${{ inputs.learning-rate }},--num_epochs=${{ inputs.num-epochs }}"]
                    env:
