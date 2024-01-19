@@ -50,7 +50,7 @@ jobs:
            apiVersion: "batch/v1"
            kind: "Job"
            metadata:
-             name: "${{ format('{0}-{1}-{2}-{3}', github.event.inputs.job-name, inputs.batch-size, ${inputs.learning-rate//./_}, inputs.num-epochs) }}"
+             name: "${{ format('{0}-{1}-${{2}//./_}-{3}', github.event.inputs.job-name, inputs.batch-size, inputs.learning-rate, inputs.num-epochs) }}"
            spec:
             template:
                spec:
