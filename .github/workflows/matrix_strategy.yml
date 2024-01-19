@@ -41,6 +41,7 @@ jobs:
       batch_size: ${{ steps.set-batch-size.outputs.batch_size }}
       learning_rate: ${{ steps.set-learning-rate.outputs.learning_rate }}
       num_epochs: ${{ steps.set-num-epochs.outputs.num_epochs }}
+      no_dot_lr: ${{ steps.set-no-dot-lr.outputs.no_dot_lr }}
     steps:
       - name: Python setup
         uses: actions/setup-python@v3
@@ -59,6 +60,10 @@ jobs:
         run: |
           num_epochs=$(python -c "print(str('${{ github.event.inputs.num-epochs }}'.split(',')).replace(' ', ''))")
           echo "num_epochs=$num_epochs" >> $GITHUB_OUTPUT
+      - id: set-no-dot-lr
+        run: |
+          no_dot_lr=${${{ github.event.inputs.learning-rate }}//./_}
+          echo "no_dot_lr=$no_dot_lr" >> $GITHUB_OUTPUT
 
   call-deploy-existing:
     needs: prejob
@@ -96,6 +101,7 @@ jobs:
       batch-size: ${{ matrix.batch_size }}
       learning-rate: ${{ matrix.learning_rate }}
       num-epochs: ${{ matrix.num_epochs }}
+      no-dot-lr: ${{ needs.prejob.outputs.no_dot_lr }}
     secrets:
       google-auth: ${{ secrets.GOOGLE_CREDENTIALS }}
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
