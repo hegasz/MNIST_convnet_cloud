@@ -33,6 +33,10 @@ jobs:
   build-and-push:
     runs-on: self-hosted
     steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      
       - name: Docker root privileges
         run: sudo docker build -t test-compute-image .
     
