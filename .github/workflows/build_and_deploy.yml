@@ -34,7 +34,7 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Docker root privileges
-        run: sudo usermod -aG docker $USER
+        run: sudo docker build -t test-compute-image .
     
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
