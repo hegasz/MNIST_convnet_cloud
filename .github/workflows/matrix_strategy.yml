@@ -49,21 +49,25 @@ jobs:
           python-version: 3.8
 
       - id: set-batch-size
+        name: Set batch size variable
         run: |
           batch_size=$(python -c "print(str('${{ github.event.inputs.batch-size }}'.split(',')).replace(' ', ''))")
           echo "batch_size=$batch_size" >> $GITHUB_OUTPUT
       - id: set-learning-rate
+        name: Set learning rate variable
         run: |
           learning_rate=$(python -c "print(str('${{ github.event.inputs.learning-rate }}'.split(',')).replace(' ', ''))")
           echo "learning_rate=$learning_rate" >> $GITHUB_OUTPUT
       - id: set-num-epochs
+        name: Set epochs number variable
         run: |
           num_epochs=$(python -c "print(str('${{ github.event.inputs.num-epochs }}'.split(',')).replace(' ', ''))")
           echo "num_epochs=$num_epochs" >> $GITHUB_OUTPUT
       - id: set-no-dot-lr
+        name: Replace '.' in learning rate to send to job name
         run: |
           var="${{ github.event.inputs.learning-rate }}"
-          no_dot_lr=${var//./_}
+          no_dot_lr=${var//./"dot"}
           echo "no_dot_lr=$no_dot_lr" >> $GITHUB_OUTPUT
 
   call-deploy-existing:
