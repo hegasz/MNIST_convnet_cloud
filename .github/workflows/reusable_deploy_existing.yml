@@ -30,7 +30,7 @@ on:
 jobs:
 
   deploy-to-gke:
-    runs-on: arc-runner-set
+    runs-on: self-hosted
     steps:    
     - name: Checkout Repository
       uses: actions/checkout@v2
@@ -70,8 +70,6 @@ jobs:
 
     - name: Apply Kubernetes Job
       run: |
-           sudo apt-get update
-           sudo apt-get install -y curl
            curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
 
            # Make kubectl executable
