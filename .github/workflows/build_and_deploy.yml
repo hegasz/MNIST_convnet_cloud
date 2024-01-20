@@ -33,11 +33,6 @@ jobs:
   build-and-push:
     runs-on: self-hosted
     steps:
-      - name: temp
-        run: echo $USER
-      - name: temp2
-        run: docker version
-    
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
         
